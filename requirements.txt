@@ -1,0 +1,4 @@
+telethon
+apscheduler
+pytz
+PySocks
