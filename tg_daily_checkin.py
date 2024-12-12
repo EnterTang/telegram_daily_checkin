@@ -17,21 +17,29 @@ import shutil
 import base64
 
 # 从环境变量读取配置
-api_id = os.environ.get("TG_API_ID")
-api_hash = os.environ.get("TG_API_HASH")
+# api_id = os.environ.get("TG_API_ID")
+# api_hash = os.environ.get("TG_API_HASH")
 
+# use_proxy = False
+# proxy_host = os.environ.get("PROXY_HOST")
+# proxy_type = socks.HTTP  # 如果需要可配置，可以使用 getattr(socks, os.environ.get("PROXY_TYPE", "HTTP"))
+# proxy_port = int(os.environ.get("PROXY_PORT", "7890"))  # 提供默认值并转换为整数
+# proxy = (proxy_type, proxy_host, proxy_port)
+api_id = None
+api_hash = None
+botids = None
+daily_checkin_str = None
 use_proxy = False
-proxy_host = os.environ.get("PROXY_HOST")
-proxy_type = socks.HTTP  # 如果需要可配置，可以使用 getattr(socks, os.environ.get("PROXY_TYPE", "HTTP"))
-proxy_port = int(os.environ.get("PROXY_PORT", "7890"))  # 提供默认值并转换为整数
-proxy = (proxy_type, proxy_host, proxy_port)
-
+proxy_host = None
+proxy_type = socks.HTTP
+proxy_port = None
+proxy = None
 
 BUTTON_KEYWORD_CONFIG = {}
 
-# botids 必须从环境变量读取，daily_checkin_str 保留默认值
-botids = [int(id.strip()) for id in os.environ["TG_BOT_IDS"].split(",")]
-daily_checkin_str = os.environ.get("TG_CHECKIN_COMMAND", "/start")
+# # botids 必须从环境变量读取，daily_checkin_str 保留默认值
+# botids = [int(id.strip()) for id in os.environ["TG_BOT_IDS"].split(",")]
+# daily_checkin_str = os.environ.get("TG_CHECKIN_COMMAND", "/start")
 
 
 BUTTON_KEYWORD_CONFIG["签到"] = {
@@ -157,9 +165,31 @@ async def send_scheduled_message():
 
 # === 主程序 ===
 async def main():
-    global monitor_active, client, scheduler, own_user_id
+    global monitor_active, client, scheduler, own_user_id, api_id, api_hash, botids, daily_checkin_str
 
     logger.info('启动Telegram监控程序...')
+    
+    # 检查 session 文件是否存在
+    session_file = 'session_name.session'
+    if os.path.exists(session_file):
+        logger.info('检测到已存在的 session 文件，开始读取环境变量...')
+        # 读取环境变量
+        api_id = os.environ.get("TG_API_ID")
+        api_hash = os.environ.get("TG_API_HASH")
+        try:
+            botids = [int(id.strip()) for id in os.environ["TG_BOT_IDS"].split(",")]
+        except KeyError:
+            logger.error('未找到必需的环境变量 TG_BOT_IDS')
+            return
+        daily_checkin_str = os.environ.get("TG_CHECKIN_COMMAND", "/start")
+    else:
+        logger.info('未检测到 session 文件，进入登录流程...')
+        # 登录流程需要的基本配置
+        api_id = input('请输入 API ID: ').strip()
+        api_hash = input('请输入 API Hash: ').strip()
+        botids = [int(id.strip()) for id in input('请输入 Bot IDs (用逗号分隔): ').strip().split(",")]
+        daily_checkin_str = "/start"  # 使用默认值
+
     if use_proxy:
         client = TelegramClient('session_name', api_id, api_hash, proxy=proxy)
     else:
