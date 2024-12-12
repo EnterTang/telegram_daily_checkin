@@ -120,7 +120,10 @@ async def message_handler(event):
 
     if not monitor_active:
         return
-
+    # 增加消息和按钮的空值检查
+    if not event or not event.message:
+        return
+    
     chat_id = event.chat_id
     message_id = event.message.id
     message_text = event.raw_text or ''
@@ -236,17 +239,4 @@ if __name__ == '__main__':
     except Exception as e:
         error_message = repr(e)
         logger.error(f'程序发生错误：{error_message}')
-
-
-if __name__ == '__main__':
-    monitor_active = True
-    client = None
-    scheduler = AsyncIOScheduler()
-
-    try:
-        asyncio.run(main())
-    except KeyboardInterrupt:
-        logger.info('程序被用户中断')
-    except Exception as e:
-        error_message = repr(e)
-        logger.error(f'程序发生错误：{error_message}')
+        sys.exit(1)  # 确保程序真正退出
