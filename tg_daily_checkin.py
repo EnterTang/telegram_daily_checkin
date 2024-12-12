@@ -154,7 +154,9 @@ async def message_handler(event):
     except Exception as e:
         error_message = repr(e)
         logger.error(f'处理消息时发生错误：{error_message}')
-
+        await client.disconnect()
+        scheduler.shutdown()
+        logger.info('程序已退出')
 
 
 async def send_scheduled_message():
@@ -165,9 +167,7 @@ async def send_scheduled_message():
             logger.info(f"已发送定时消息到 bot_id: {bot_id}")
     except Exception as e:
         logger.error(f"发送定时消息时发生错误：{e}")
-        await client.disconnect()
-        scheduler.shutdown()
-        logger.info('程序已退出')
+
 
 # === 主程序 ===
 async def main():
