@@ -6,13 +6,14 @@
 
 # 2 使用方法
 
-## 2.1 青龙拉取仓库
+## 2.1 青龙添加单文件
 
 ``` bash
-ql repo https://github.com/EnterTang/telegram_daily_checkin.git
+ql raw https://raw.githubusercontent.com/EnterTang/telegram_daily_checkin/refs/heads/main/tg_daily_checkin.py
 ```
 
-![image.png](https://piclist-1257076368.cos.ap-shanghai.myqcloud.com/picture/202412121551264.png)
+![image.png](https://piclist-1257076368.cos.ap-shanghai.myqcloud.com/picture/202412121646556.png)
+
 
 ## 2.2 添加依赖
 
@@ -50,9 +51,13 @@ docker exec -it qinglong bash
 cd /ql/data/repo/EnterTang_telegram_daily_checkin_main
 
 python3 tg_daily_checkin.py
+
+cp session_name.session /ql/data/scripts/
 ```
 
 根据提示输入tg 手机号和验证码，登录成功后当前路径下将生成`session_name.session`文件
+
+![image.png](https://piclist-1257076368.cos.ap-shanghai.myqcloud.com/picture/202412121625047.png)
 
 ![image.png](https://piclist-1257076368.cos.ap-shanghai.myqcloud.com/picture/202412121604128.png)
 
